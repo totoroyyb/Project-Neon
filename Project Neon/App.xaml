@@ -1,0 +1,38 @@
+﻿<Application
+    x:Class="Project_Neon.App"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Project_Neon"
+    RequestedTheme="Dark">
+
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.ThemeDictionaries>
+                <ResourceDictionary x:Key="Default">
+                    <AcrylicBrush x:Key="BGAcrylicBrush"
+                      BackgroundSource="Backdrop"
+                      TintColor="White"
+                      TintOpacity="0.6"
+                      FallbackColor="White"/>
+                </ResourceDictionary>
+
+                <ResourceDictionary x:Key="Dark">
+                    <AcrylicBrush x:Key="BGAcrylicBrush"
+                      BackgroundSource="Backdrop"
+                      TintColor="Black"
+                      TintOpacity="0.6"
+                      FallbackColor="Black"/>
+                </ResourceDictionary>
+
+                <ResourceDictionary x:Key="Light">
+                    <AcrylicBrush x:Key="BGAcrylicBrush"
+                      BackgroundSource="Backdrop"
+                      TintColor="White"
+                      TintOpacity="0.6"
+                      FallbackColor="White"/>
+                </ResourceDictionary>
+            </ResourceDictionary.ThemeDictionaries>
+        </ResourceDictionary>
+
+    </Application.Resources>
+</Application>
