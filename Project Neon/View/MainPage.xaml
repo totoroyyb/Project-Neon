@@ -6,19 +6,30 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
-
+    
     <Grid>
         <Grid.Background>
             <ImageBrush ImageSource="/Assets/MainBG/Test.jpg" Stretch="UniformToFill"/>
         </Grid.Background>
 
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" MinHeight="0"/>
-            <RowDefinition/>
-        </Grid.RowDefinitions>
+        <Frame x:Name="myFrame" Margin="0, -0, 0, 0">
+            <Frame.ContentTransitions>
+                <TransitionCollection>
+                    <NavigationThemeTransition/>
+                </TransitionCollection>
+            </Frame.ContentTransitions>
+        </Frame>
 
-        <NavigationView SelectionChanged="myNavi_SelectionChanged"
-                            x:Name="myNavi" Grid.Row="0" Grid.RowSpan="2"
+        <TextBlock x:Name="AppTitle"
+                   xmlns:appmodel="using:Windows.ApplicationModel"
+                   Text="{x:Bind appmodel:Package.Current.DisplayName}" 
+                   Style="{StaticResource CaptionTextBlockStyle}" 
+                   IsHitTestVisible="False" 
+                   Canvas.ZIndex="1"/>
+
+
+        <NavigationView Canvas.ZIndex="0" SelectionChanged="myNavi_SelectionChanged" Header="Test"
+                            x:Name="myNavi"
                             AlwaysShowHeader="True">
             <NavigationView.MenuItems>
                 <NavigationViewItem Icon="home" Content="Welcome Menu" Tag="welpage" Name="welItem"/>
@@ -28,20 +39,8 @@
                     <NavigationViewItem Icon="like" Content="评价与反馈" Tag="reviewpage" Name="reviewItem"/>-->
             </NavigationView.MenuItems>
 
-
-            <Frame x:Name="myFrame" Margin="0, -80, 0, 0">
-                <Frame.ContentTransitions>
-                    <TransitionCollection>
-                        <NavigationThemeTransition/>
-                    </TransitionCollection>
-                </Frame.ContentTransitions>
-            </Frame>
+            
         </NavigationView>
-
-        <Grid Grid.Row="0">
-            <TextBlock Style="{StaticResource TitleTextBlockStyle}"
-                           Name="TitleBlock" FontSize="15"/>
-        </Grid>
 
     </Grid>
 </Page>

@@ -15,7 +15,7 @@
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="auto"/>
             </Grid.RowDefinitions>
-
+            <Image Name="TestImage"/>
             <TextBlock Name="MediaTitleBlock" Height="33" Foreground="White"/>
 
             <Button Content="&#xE72B;" FontFamily="Segoe MDL2 Assets"

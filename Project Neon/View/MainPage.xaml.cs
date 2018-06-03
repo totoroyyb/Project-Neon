@@ -30,6 +30,14 @@ namespace Project_Neon
             this.InitializeComponent();
             InitFrame();
             SetTitleBar();
+
+        }
+
+        void UpdateAppTitle()
+        {
+            var full = (ApplicationView.GetForCurrentView().IsFullScreenMode);
+            var left = 12 + (full ? 0 : CoreApplication.GetCurrentView().TitleBar.SystemOverlayLeftInset);
+            AppTitle.Margin = new Thickness(left, 8, 0, 0);
         }
 
         private void InitFrame()
@@ -39,9 +47,7 @@ namespace Project_Neon
         }
 
         private void SetTitleBar()
-        {
-            var titleBar = ApplicationView.GetForCurrentView().TitleBar;
-            
+        {   
             ApplicationView appView = ApplicationView.GetForCurrentView();
             appView.Title = "Neon";
 
@@ -51,23 +57,27 @@ namespace Project_Neon
         private void RegisterTitleBarChanged()
         {
             var coreTitleBar = CoreApplication.GetCurrentView().TitleBar;
+            Window.Current.CoreWindow.SizeChanged += (s, e) => UpdateAppTitle();
+            coreTitleBar.LayoutMetricsChanged += (s, e) => UpdateAppTitle();
 
-            // Register a handler for when the title bar visibility changes.
-            // For example, when the title bar is invoked in full screen mode.
-            coreTitleBar.IsVisibleChanged += CoreTitleBar_IsVisibleChanged;
+            //var coreTitleBar = CoreApplication.GetCurrentView().TitleBar;
+
+            //// Register a handler for when the title bar visibility changes.
+            //// For example, when the title bar is invoked in full screen mode.
+            //coreTitleBar.IsVisibleChanged += CoreTitleBar_IsVisibleChanged;
         }
 
-        private void CoreTitleBar_IsVisibleChanged(CoreApplicationViewTitleBar sender, object args)
-        {
-            if (sender.IsVisible)
-            {
-                TitleBlock.Visibility = Visibility.Visible;
-            }
-            else
-            {
-                TitleBlock.Visibility = Visibility.Collapsed;
-            }
-        }
+        //private void CoreTitleBar_IsVisibleChanged(CoreApplicationViewTitleBar sender, object args)
+        //{
+        //    if (sender.IsVisible)
+        //    {
+        //        TitleBlock.Visibility = Visibility.Visible;
+        //    }
+        //    else
+        //    {
+        //        TitleBlock.Visibility = Visibility.Collapsed;
+        //    }
+        //}
 
         private void myNavi_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
         {
