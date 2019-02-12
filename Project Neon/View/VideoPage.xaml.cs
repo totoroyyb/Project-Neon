@@ -3,24 +3,13 @@ using Project_Neon.Collection;
 using Project_Neon.Helper;
 using Project_Neon.Model;
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Foundation;
 using Windows.Foundation.Collections;
-using Windows.Graphics.DirectX.Direct3D11;
 using Windows.Media.Core;
 using Windows.Media.Playback;
 using Windows.Storage;
 using Windows.Storage.Streams;
-using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=234238
@@ -35,6 +24,7 @@ namespace Project_Neon.View
         private StorageFile inputFile;
         private FFmpegInteropMSS ffmpegMss;
         private string inputURI;
+        private MediaPlaybackItem playbackItem;
 
         public VideoPage()
         {
@@ -56,10 +46,10 @@ namespace Project_Neon.View
             }
         }
 
-        protected override void OnNavigatedFrom(NavigationEventArgs e)
-        {
-            MediaPlayerHelper.CleanUpMediaPlayerSource(VideoBox.MediaPlayer);
-        }
+        //protected override void OnNavigatedFrom(NavigationEventArgs e)
+        //{
+        //    MediaPlayerHelper.CleanUpMediaPlayerSource(VideoBox);
+        //}
 
         private void WelPage_OnOpenUriReady(object source, EventArgs e)
         {
@@ -79,11 +69,11 @@ namespace Project_Neon.View
 
             if (inputFile != null)
             {
-                VideoBox.Source = MediaSource.CreateFromStorageFile(inputFile);
-                VideoBox.MediaPlayer.RealTimePlayback = true;
-                VideoBox.MediaPlayer.Play();
+                VideoBox.SetPlaybackSource(MediaSource.CreateFromStorageFile(inputFile));
+                //VideoBox.MediaPlayer.RealTimePlayback = true;
+                VideoBox.Play();
 
-                VideoBox.MediaPlayer.MediaFailed += LocalMediaFailed;
+                //VideoBox.MediaPlayer.MediaFailed += LocalMediaFailed;
             }
         }
 
@@ -91,7 +81,7 @@ namespace Project_Neon.View
         {
             if (args.Error == MediaPlayerError.SourceNotSupported)
             {
-                TryToUseFFmpegLocal(sender, args);
+                TryToUseFFmpegLocal();
             }
 
             //await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
@@ -104,116 +94,179 @@ namespace Project_Neon.View
         {
             if (args.Error == MediaPlayerError.SourceNotSupported)
             {
-                TryToUseFFmpegURI(sender, args);
+                TryToUseFFmpegURI();
             }
-            
+
             //await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             //{
             //    VideoBox.MediaPlayer.MediaFailed -= URIMediaFailed;
             //});
         }
 
-        private async void TryToUseFFmpegLocal(MediaPlayer sender, MediaPlayerFailedEventArgs args)
+        private async void TryToUseFFmpegLocal()
         {
-            try
+            if (inputFile != null)
             {
+                VideoBox.Stop();
+
+                // Open StorageFile as IRandomAccessStream to be passed to FFmpegInteropMSS
                 IRandomAccessStream readStream = await inputFile.OpenAsync(FileAccessMode.Read);
 
-                ffmpegMss = FFmpegInteropMSS.CreateFFmpegInteropMSSFromStream(readStream, false, false);
-
-                if (ffmpegMss != null)
+                try
                 {
-                    MediaStreamSource mss = ffmpegMss.GetMediaStreamSource();
-
-                    if (mss != null)
+                    // Instantiate FFmpegInteropMSS using the opened local file stream
+                    ffmpegMss = await FFmpegInteropMSS.CreateFromStreamAsync(readStream);
+                    
+                    if (ffmpegMss != null)
                     {
-                        mss.BufferTime = TimeSpan.Zero;
-                        sender.Source = MediaSource.CreateFromMediaStreamSource(mss);
-                        sender.RealTimePlayback = true;
-                        sender.Play();
+                        playbackItem = ffmpegMss.CreateMediaPlaybackItem();
+
+                        // Pass MediaStreamSource to Media Element
+                        VideoBox.SetPlaybackSource(playbackItem);
                     }
                     else
                     {
                         ShowDialog.DisplayErrorMessage(ErrorInfo.CannotOpen);
                     }
+
                 }
-                else
+                catch (Exception ex)
                 {
-                    ShowDialog.DisplayErrorMessage(ErrorInfo.CannotOpen);
+                    ShowDialog.DisplayErrorMessage(ex.Message);
                 }
             }
-            catch (Exception ex)
-            {
-                ShowDialog.DisplayErrorMessage(ex.Message);
-            }
+
+            //try
+            //{
+            //    IRandomAccessStream readStream = await inputFile.OpenAsync(FileAccessMode.Read);
+
+            //    ffmpegMss = await FFmpegInteropMSS.CreateFromStreamAsync(readStream);
+
+            //    if (ffmpegMss != null)
+            //    {
+            //        MediaStreamSource mss = ffmpegMss.GetMediaStreamSource();
+
+            //        if (mss != null)
+            //        {
+            //            mss.BufferTime = TimeSpan.Zero;
+            //            sender.Source = MediaSource.CreateFromMediaStreamSource(mss);
+            //            sender.RealTimePlayback = true;
+            //            sender.Play();
+            //        }
+            //        else
+            //        {
+            //            ShowDialog.DisplayErrorMessage(ErrorInfo.CannotOpen);
+            //        }
+            //    }
+            //    else
+            //    {
+            //        ShowDialog.DisplayErrorMessage(ErrorInfo.CannotOpen);
+            //    }
+            //}
+            //catch (Exception ex)
+            //{
+            //    ShowDialog.DisplayErrorMessage(ex.Message);
+            //}
         }
 
-        private void TryToUseFFmpegURI(MediaPlayer sender, MediaPlayerFailedEventArgs args)
+        private async void TryToUseFFmpegURI()
         {
             try
             {
                 // Set FFmpeg specific options. List of options can be found in https://www.ffmpeg.org/ffmpeg-protocols.html
-                PropertySet options = new PropertySet();
 
                 // Below are some sample options that you can set to configure RTSP streaming
-                // options.Add("rtsp_flags", "prefer_tcp");
-                // options.Add("stimeout", 100000);
+                // Config.FFmpegOptions.Add("rtsp_flags", "prefer_tcp");
+                // Config.FFmpegOptions.Add("stimeout", 100000);
 
                 // Instantiate FFmpegInteropMSS using the URI
-                ffmpegMss = FFmpegInteropMSS.CreateFFmpegInteropMSSFromUri(inputURI, false, false, options);
-                if (ffmpegMss != null)
-                {
-                    MediaStreamSource mss = ffmpegMss.GetMediaStreamSource();
+                VideoBox.Stop();
+                ffmpegMss = await FFmpegInteropMSS.CreateFromUriAsync(inputURI);
+                var source = ffmpegMss.CreateMediaPlaybackItem();
 
-                    if (mss != null)
-                    {
-                        // Pass MediaStreamSource to Media Element
-                        VideoBox.Source = MediaSource.CreateFromMediaStreamSource(mss);
-                    }
-                    else
-                    {
-                        ShowDialog.DisplayErrorMessage(ErrorInfo.CannotOpen);
-                    }
-                }
-                else
-                {
-                    ShowDialog.DisplayErrorMessage(ErrorInfo.CannotOpen);
-                }
+                // Pass MediaStreamSource to Media Element
+                VideoBox.SetPlaybackSource(source);
             }
             catch (Exception ex)
             {
                 ShowDialog.DisplayErrorMessage(ex.Message);
             }
+
+
+            //try
+            //{
+            //    // Set FFmpeg specific options. List of options can be found in https://www.ffmpeg.org/ffmpeg-protocols.html
+            //    PropertySet options = new PropertySet();
+
+            //    // Below are some sample options that you can set to configure RTSP streaming
+            //    // options.Add("rtsp_flags", "prefer_tcp");
+            //    // options.Add("stimeout", 100000);
+
+            //    // Instantiate FFmpegInteropMSS using the URI
+            //    ffmpegMss = await FFmpegInteropMSS.CreateFromUriAsync(inputURI);
+            //    if (ffmpegMss != null)
+            //    {
+            //        MediaStreamSource mss = ffmpegMss.GetMediaStreamSource();
+
+            //        if (mss != null)
+            //        {
+            //            // Pass MediaStreamSource to Media Element
+            //            VideoBox.Source = MediaSource.CreateFromMediaStreamSource(mss);
+            //        }
+            //        else
+            //        {
+            //            ShowDialog.DisplayErrorMessage(ErrorInfo.CannotOpen);
+            //        }
+            //    }
+            //    else
+            //    {
+            //        ShowDialog.DisplayErrorMessage(ErrorInfo.CannotOpen);
+            //    }
+            //}
+            //catch (Exception ex)
+            //{
+            //    ShowDialog.DisplayErrorMessage(ex.Message);
+            //}
         }
 
-        private void TryToLoadAndPlay(StorageFile file)
-        {   
+        private async void TryToLoadAndPlay(StorageFile file)
+        {
             inputFile = file;
+            var stream = await inputFile.OpenAsync(FileAccessMode.Read);
+            VideoBox.SetPlaybackSource(MediaSource.CreateFromStorageFile(inputFile));
 
-            VideoBox.Source = MediaSource.CreateFromStorageFile(inputFile);
-            VideoBox.MediaPlayer.RealTimePlayback = true;
-            VideoBox.MediaPlayer.Play();
+            VideoBox.Play();
+            //VideoBox.MediaPlayer.RealTimePlayback = true;
+            //VideoBox.MediaPlayer.Play();
             MediaTitleBlock.Text = inputFile.DisplayName;
-            
-            VideoBox.MediaPlayer.MediaFailed += LocalMediaFailed;
+
+            //VideoBox.MediaPlayer.MediaFailed += LocalMediaFailed;
         }
 
         private void TryToLoadAndPlay(string uri)
         {
             inputURI = uri;
 
-            VideoBox.Source = MediaSource.CreateFromUri(new Uri(inputURI));
-            VideoBox.MediaPlayer.Play();
-            
-            VideoBox.MediaPlayer.MediaFailed += URIMediaFailed;
+            VideoBox.SetPlaybackSource(MediaSource.CreateFromUri(new Uri(inputURI)));
+            VideoBox.Play();
+
+            //VideoBox.MediaPlayer.MediaFailed += URIMediaFailed;
         }
 
         private void BackButton_Click(object sender, RoutedEventArgs e)
         {
-            VideoBox.MediaPlayer.MediaFailed -= LocalMediaFailed;
-            VideoBox.MediaPlayer.MediaFailed -= URIMediaFailed;
+            //VideoBox.MediaPlayer.MediaFailed -= LocalMediaFailed;
+            //VideoBox.MediaPlayer.MediaFailed -= URIMediaFailed;
             Frame rootFrame = Window.Current.Content as Frame;
             rootFrame.Navigate(typeof(MainPage));
+        }
+
+        private void MediaFailed(object sender, ExceptionRoutedEventArgs e)
+        {
+            if (e.ErrorMessage == "MF_MEDIA_ENGINE_ERR_SRC_NOT_SUPPORTED : HRESULT - 0xC00D36C4")
+            {
+                TryToUseFFmpegLocal();
+            }
         }
     }
 }

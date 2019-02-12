@@ -22,9 +22,13 @@
                     Foreground="White" Grid.Row="1" FontSize="25"
                     Name="BackButton"
                     Click="BackButton_Click"/>
-
-            <MediaPlayerElement Name="VideoBox" AreTransportControlsEnabled="True"
-                            Background="Black" Grid.Row="2"/>
+            
+            <MediaElement x:Name="VideoBox"
+                        AreTransportControlsEnabled="True"
+                        AudioCategory="ForegroundOnlyMedia"
+                        AutoPlay="True"
+                        MediaFailed="MediaFailed"
+                        Grid.Row="2"/>
 
             <StackPanel Orientation="Horizontal" Grid.Row="3">
                 <Button Name="picker" Background="White"
