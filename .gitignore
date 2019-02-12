@@ -3,8 +3,7 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
-FFmpegInterop/ffmpeg/Output
-FFmpegInterop/ffmpeg/Build
+FFmpegInterop/ffmpeg
 
 # User-specific files
 *.DS_Store
