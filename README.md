@@ -33,23 +33,32 @@ This project just barely start, aiming to build a modern, gorgeous, and efficien
 
 * First, Get the source code of Project-Neon
 
-  You can click Download on the web page or clone it by command lines
+  
 
-	git clone https://github.com/totoroyyb/Project-Neon.git
+  You can click Download on the web page or clone it by command lines
+  ```git clone https://github.com/totoroyyb/Project-Neon.git```
+
+  
 
 * After downloading the source file, cd to the root directory of solution and then clone the source files of FFmpegInterop
 
-	git clone --recursive https://github.com/ffmpeginteropx/FFmpegInteropX.git
+  ```git clone --recursive https://github.com/ffmpeginteropx/FFmpegInteropX.git```
+
+  
 
 * Installing ffmpeg build tools
 
   Now that you have the FFmpeg source code, you can follow the instructions on how to [build FFmpeg for WinRT](https://trac.ffmpeg.org/wiki/CompilationGuide/WinRT) apps. *Follow the setup instruction very carefully to avoid build issues!! Be very careful not to miss a single step. If you have problems building ffmpeg, go through these steps again, since chances are high that you missed some detail.*
+
+  
 
 * Building ffmpeg with Visual Studio 2017
 
   After installing the ffmpeg build tools, you can invoke `BuildFFmpeg_VS2017.bat` from a normal cmd prompt. It builds all Windows 10 versions of ffmpeg (x86, x64, ARM and ARM64). 
 
   Note: You need Visual Studio 2017 15.9.0 or higher to build the ARM64 version of ffmpeg!
+
+  
 
 * Building the FFmpegInterop Library
 
@@ -58,6 +67,8 @@ This project just barely start, aiming to build a modern, gorgeous, and efficien
   Now you can build the FFmpegInterop library. 
 
   Simply open the Visual Studio solution file `FFmpegInterop.sln`, set one of the MediaPlayer[CS/CPP/JS] sample projects as StartUp project, and run. FFmpegInterop should build cleanly giving you the interop object as well as the selected sample MediaPlayer (C++, C# or JS) that show how to connect the MediaStreamSource to a MediaElement or Video tag for playback.
+
+  
 
 * So far, you should have done all the steps for building FFmpegInteropX and Project-Neon. Since the reference of ffmpeg library has been added into the configuration file of Project-Neon, you can right click the build button and run it.
 
