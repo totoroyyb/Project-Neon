@@ -141,7 +141,7 @@
     <Content Include="Assets\Square44x44Logo.targetsize-24_altform-unplated.png" />
     <Content Include="Assets\StoreLogo.png" />
     <Content Include="Assets\Wide310x150Logo.scale-200.png" />
-    <Content Include="$(SolutionDir)FFmpegInterop\ffmpeg\Build\Windows10\$(PlatformTarget)\bin\*.dll" />
+    <Content Include="$(SolutionDir)FFmpegInteropX\ffmpeg\Build\Windows10\$(PlatformTarget)\bin\*.dll" />
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">
@@ -179,7 +179,7 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\FFmpegInterop\FFmpegInterop\FFmpegInterop.vcxproj">
+    <ProjectReference Include="..\FFmpegInteropX\FFmpegInterop\FFmpegInterop.vcxproj">
       <Project>{9cfa3b3e-b7af-4629-84e2-c962c5b046b1}</Project>
       <Name>FFmpegInterop</Name>
     </ProjectReference>

@@ -5,7 +5,7 @@ VisualStudioVersion = 15.0.27428.2015
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Project Neon", "Project Neon\Project Neon.csproj", "{C15DA2B2-D4D7-44B7-BCE8-9CABE5902CDD}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FFmpegInterop", "FFmpegInterop\FFmpegInterop\FFmpegInterop.vcxproj", "{9CFA3B3E-B7AF-4629-84E2-C962C5B046B1}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FFmpegInterop", "FFmpegInteropX\FFmpegInterop\FFmpegInterop.vcxproj", "{9CFA3B3E-B7AF-4629-84E2-C962C5B046B1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
